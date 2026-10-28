@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\RaffleController;
 use App\Http\Controllers\FacebookOAuthController;
+use App\Http\Controllers\UserConfigController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -80,6 +81,11 @@ Route::group(
             Route::get('/{id}', [RaffleController::class, 'show']);                     // Ver ganador
             Route::put('/{id}', [RaffleController::class, 'update']);                   // Actualizar ganador
             Route::delete('/{id}', [RaffleController::class, 'destroy']);               // Eliminar ganador
+        });
+
+        Route::prefix('user-configs')->group(function () {
+            Route::get('/{key}', [UserConfigController::class, 'show']);
+            Route::put('/{key}', [UserConfigController::class, 'upsert']);
         });
     }
 );

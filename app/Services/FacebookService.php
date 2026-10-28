@@ -17,9 +17,6 @@ class FacebookService
         $this->accessToken = config('services.facebook.access_token');
         $this->apiVersion = config('services.facebook.api_version', 'v18.0');
         $this->baseUrl = "https://graph.facebook.com/{$this->apiVersion}";
-
-        // Validar token al inicializar
-        $this->validateToken();
     }
 
     /**
@@ -51,12 +48,19 @@ class FacebookService
         }
     }
 
+    protected function ensureAccessToken(): void
+    {
+        $this->validateToken();
+    }
+
     /**
      * Verificar si el token es válido haciendo una llamada de prueba
      */
     public function testConnection()
     {
         try {
+            $this->ensureAccessToken();
+
             $response = Http::get("{$this->baseUrl}/me", [
                 'access_token' => $this->accessToken,
                 'fields' => 'id,name',
@@ -93,6 +97,8 @@ class FacebookService
     public function getPostEngagement(string $postId)
     {
         try {
+            $this->ensureAccessToken();
+
             $response = Http::get("{$this->baseUrl}/{$postId}", [
                 'fields' => 'comments.limit(1000){id,from,message,created_time,like_count},likes.limit(1000){id,name,pic}',
                 'access_token' => $this->accessToken,
@@ -122,6 +128,8 @@ class FacebookService
     public function getPostComments(string $postId, ?string $after = null)
     {
         try {
+            $this->ensureAccessToken();
+
             $params = [
                 'fields' => 'id,from,message,created_time,like_count,comments',
                 'access_token' => $this->accessToken,
@@ -157,6 +165,8 @@ class FacebookService
     public function getPostLikes(string $postId, ?string $after = null)
     {
         try {
+            $this->ensureAccessToken();
+
             $params = [
                 'access_token' => $this->accessToken,
                 'limit' => 100,
@@ -191,6 +201,8 @@ class FacebookService
     public function getPostShares(string $postId)
     {
         try {
+            $this->ensureAccessToken();
+
             $response = Http::get("{$this->baseUrl}/{$postId}/sharedposts", [
                 'access_token' => $this->accessToken,
                 'fields' => 'id,from,created_time,message',

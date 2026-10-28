@@ -18,8 +18,6 @@ class FacebookSourceProvider implements ParticipantSourceInterface
         $this->accessToken = config('services.facebook.access_token');
         $this->apiVersion = config('services.facebook.api_version', 'v18.0');
         $this->baseUrl = "https://graph.facebook.com/{$this->apiVersion}";
-
-        $this->validateToken();
     }
 
     protected function validateToken()
@@ -30,6 +28,11 @@ class FacebookSourceProvider implements ParticipantSourceInterface
                 "Consulta FACEBOOK_TOKEN_SETUP.md"
             );
         }
+    }
+
+    protected function ensureAccessToken(): void
+    {
+        $this->validateToken();
     }
 
     public function fetchParticipants(array $config, string $interactionType = 'comment'): array
@@ -50,6 +53,8 @@ class FacebookSourceProvider implements ParticipantSourceInterface
                 Log::warning('fetchParticipants: access_token override inválido: ' . $e->getMessage());
             }
         }
+
+        $this->ensureAccessToken();
 
         try {
             switch ($interactionType) {
